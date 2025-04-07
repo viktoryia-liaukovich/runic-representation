@@ -1,0 +1,1 @@
+export {SvgRepresentation} from "./SvgRepresentation"
