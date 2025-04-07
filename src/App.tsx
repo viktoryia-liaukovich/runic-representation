@@ -1,34 +1,46 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useRef, useState } from 'react';
 import './App.css'
+import { SvgRepresentation } from './components'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [decimalNumber, setDecimalNumber] = useState('0');
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  const handleDownload = () => {
+    const svg = svgRef.current;
+    if (!svg) return;
+
+    const serializer = new XMLSerializer();
+    const source = serializer.serializeToString(svg);
+    const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `runes_${decimalNumber}.svg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const number = e.target.value;
+
+    const clampedNumber = Math.max(0, Math.min(9999, parseInt(number)));
+    setDecimalNumber(clampedNumber.toString());
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <main className='main'>
+      <SvgRepresentation number={decimalNumber} ref={svgRef} />
+      <input
+        className='number-input'
+        type="number"
+        onChange={handleNumberChange}
+        value={decimalNumber}
+      />
+      <button onClick={handleDownload}>Download SVG</button>
+    </main>
   )
 }
 
