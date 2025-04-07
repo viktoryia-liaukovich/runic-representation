@@ -1,12 +1,17 @@
 import { forwardRef, ReactElement } from "react";
-import config from "../config.json";
+import config from "../config";
 
+/**
+ * A record of SVG line elements representing different line segments.
+ * Each key in the record corresponds to a unique identifier for a line,
+ * and the value is a ReactElement representing an SVG `<line>` element.
+ */
 const lines: Record<string, ReactElement> = {
-  "a": <line id="A" data-title="top horizontal" x1="50" y1="20" x2="150" y2="20" stroke="gray" stroke-width="10" stroke-linecap="round" />,
-  "b": <line id="B" data-title="right vertical" x1="150" y1="20" x2="150" y2="130" stroke="gray" stroke-width="10" stroke-linecap="round" />,
-  "d": <line id="D" data-title="middle horizontal" x1="50" y1="135" x2="150" y2="135" stroke="gray" stroke-width="10" stroke-linecap="round" />,
-  "e": <line id="E" data-title="diagonal \" x1="50" y1="20" x2="150" y2="130" stroke="gray" stroke-width="10" stroke-linecap="round" />,
-  "f": <line id="F" data-title="diagonal /" x1="150" y1="20" x2="50" y2="130" stroke="gray" stroke-width="10" stroke-linecap="round" />,
+  "a": <line key="A" data-title="top horizontal" x1="50" y1="20" x2="150" y2="20" stroke="gray" strokeWidth="10" strokeLinecap="round" />,
+  "b": <line key="B" data-title="right vertical" x1="150" y1="20" x2="150" y2="130" stroke="gray" strokeWidth="10" strokeLinecap="round" />,
+  "d": <line key="D" data-title="middle horizontal" x1="50" y1="135" x2="150" y2="135" stroke="gray" strokeWidth="10" strokeLinecap="round" />,
+  "e": <line key="E" data-title="diagonal \" x1="50" y1="20" x2="150" y2="130" stroke="gray" strokeWidth="10" strokeLinecap="round" />,
+  "f": <line key="F" data-title="diagonal /" x1="150" y1="20" x2="50" y2="130" stroke="gray" strokeWidth="10" strokeLinecap="round" />,
 }
 
 interface SvgRepresentationProps {
@@ -14,7 +19,13 @@ interface SvgRepresentationProps {
 }
 
 export const SvgRepresentation = forwardRef<SVGSVGElement, SvgRepresentationProps>(({ number }: SvgRepresentationProps, svgRef) => {
-
+  /**
+   * Transforms a given number into an array of SVG elements based on a predefined configuration.
+   *
+   * @param number - A string representing the number to be transformed.
+   * @returns An array of React elements representing the SVG lines corresponding to the given number.
+   *          If the number is not found in the configuration, returns an empty array.
+   */
   const transformToSvg = (number: string) => {
     const array = config[number as keyof typeof config];
 
@@ -27,6 +38,14 @@ export const SvgRepresentation = forwardRef<SVGSVGElement, SvgRepresentationProp
     }, [] as ReactElement[]);
   }
 
+  /**
+   * Computes the transformation properties for an element based on the given order.
+   *
+   * @param order - A number representing the order of the transformation.
+   *                - If `order % 2 === 0`, the element is not flipped horizontally.
+   *                - If `order % 2 !== 0`, the element is flipped horizontally.
+   *                - If `order > 1`, the element is flipped vertically.
+   */
   const getTransform = (order: number) => {
     const scaleX = (order % 2) * -1 || 1;
     const scaleY = order > 1 ? -1 : 1;
@@ -39,8 +58,8 @@ export const SvgRepresentation = forwardRef<SVGSVGElement, SvgRepresentationProp
   return (
     <svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" ref={svgRef}>
       <g transform="translate(150, 0)">
-        <line id="baseline" data-title="left vertical" x1="50" y1="350" x2="50" y2="20" stroke="gray" stroke-width="10" stroke-linecap="round" />
-        {number.split('').reverse().map((num, order) => <g data-number={num} style={getTransform(order)}>{transformToSvg(num)}</g>)}
+        <line id="baseline" data-title="left vertical" x1="50" y1="350" x2="50" y2="20" stroke="gray" strokeWidth="10" strokeLinecap="round" />
+        {number.split('').reverse().map((num, order) => <g key={`${num}_${order}`} data-number={num} style={getTransform(order)}>{transformToSvg(num)}</g>)}
       </g>
     </svg>
   )

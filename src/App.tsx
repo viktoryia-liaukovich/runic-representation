@@ -6,6 +6,14 @@ function App() {
   const [decimalNumber, setDecimalNumber] = useState('0');
   const svgRef = useRef<SVGSVGElement>(null);
 
+  /**
+   * Handles the download of an SVG element as a file.
+   *
+   * This function serializes the current SVG element referenced by `svgRef`,
+   * creates a Blob object from the serialized SVG data, and generates a
+   * downloadable link for the user. The downloaded file is named using the
+   * format `runes_<decimalNumber>.svg`.
+   */
   const handleDownload = () => {
     const svg = svgRef.current;
     if (!svg) return;
@@ -23,8 +31,12 @@ function App() {
     document.body.removeChild(link);
   };
 
+  /**
+   * Handles the change event for a number input field.
+   * Ensures the input value is clamped between 0 and 9999 and updates the state with the clamped value.
+   */
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const number = e.target.value;
+    const number = e.target.value || '0';
 
     const clampedNumber = Math.max(0, Math.min(9999, parseInt(number)));
     setDecimalNumber(clampedNumber.toString());
